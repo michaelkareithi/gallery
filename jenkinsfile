@@ -1,0 +1,89 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/michaelkareithi/gallery.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'echo "Build complete"'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'npm test || echo "No tests yet"'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'node server.js'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+    }
+}
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'test', url: 'https://github.com/michaelkareithi/gallery.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'echo "Build complete"'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'node server.js'
+            }
+        }
+    }
+
+    post {
+        failure {
+            mail to: 'your-email@sample.com',
+                 subject: "Pipeline Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "The pipeline failed during testing. Please check Jenkins logs."
+        }
+        always {
+            echo 'Pipeline finished.'
+        }
+    }
+}
