@@ -87,3 +87,6 @@ pipeline {
         }
     }
 }
+
+slackSend(channel: 'Morina School', message: "Build finished: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+
